@@ -1,6 +1,7 @@
-comparison_NISTHuman_nist <- function(sitesNP){
+comparison_NISTHuman_nist <- function(sitesNP,dualSub_Sites){
   meanSite = data.frame()
   sdSite = data.frame()
+  szSample = data.frame()
   spheres = 1:14
   refT1 = temperature_correction(20,42)
   for (j in seq(1,length(sitesNP))){
@@ -15,6 +16,7 @@ comparison_NISTHuman_nist <- function(sitesNP){
       #For non-voxelwise
       meanSite[cnt_sphere,j] = mean(siteData)
       sdSite[cnt_sphere,j] = sd(siteData)
+      szSample[cnt_sphere,j] = length(siteData)
       
       #Voxelwise
       sid_long <- as.matrix(rep(id,length(siteData)))
@@ -39,12 +41,13 @@ comparison_NISTHuman_nist <- function(sitesNP){
     }
     
     #Non-voxelwise
+    sid_name <- as.matrix(rep(dualSub_Sites[j],length(spheres)))
     sid <- as.matrix(rep(id,length(spheres)))
     t1ROI <- as.matrix(refT1)
     NPHuman <- as.matrix(rep("NIST phantom"),length(spheres))
     
     
-    data_Site <- data.frame(sid, t1ROI, meanSite[,j], sdSite[,j], NPHuman)
+    data_Site <- data.frame(sid_name, sid, t1ROI, meanSite[,j], sdSite[,j], NPHuman, szSample[,j])
     
     if (j==1){
       dataTmp = rbind(data.frame(), data_Site)
@@ -57,15 +60,16 @@ comparison_NISTHuman_nist <- function(sitesNP){
       dataTmp <- dataSite2plot
     }
   }
-  colnames(dataSite2plot) <- c('Site', 't1ROI', 'Mean', 'Std', 'NPHuman')
+  colnames(dataSite2plot) <- c('Site_name', 'Site', 't1ROI', 'Mean', 'Std', 'NPHuman', 'szSample')
   returnNISTData <- list("dataLong_NIST" = dataSite2plot_long,
                           "data_NIST" = dataSite2plot)
   return(returnNISTData)
 }
 
-comparison_NISThuman_human <- function(sitesH){
+comparison_NISThuman_human <- function(sitesH,dualSub_Sites){
   meanSite = data.frame()
   sdSite = data.frame()
+  szSample = data.frame()
   rois = 1:4
   labelHumanROI <- c("Genu WM","splenium WM","Deep GM","Cortical GM")
   for (j in seq(1,length(sitesH))){
@@ -80,6 +84,7 @@ comparison_NISThuman_human <- function(sitesH){
       #For non-voxelwise
       meanSite[cnt_roi,j] = mean(siteData)
       sdSite[cnt_roi,j] = sd(siteData)
+      szSample[cnt_roi,j] = length(siteData)
       
       #Voxelwise
       sid_long <- as.matrix(rep(id,length(siteData)))
@@ -104,11 +109,12 @@ comparison_NISThuman_human <- function(sitesH){
     }
     
     #Non-voxelwise
+    sid_name <- as.matrix(rep(dualSub_Sites[j],length(rois)))
     sid <- as.matrix(rep(id,length(rois)))
     t1ROI <- as.matrix(labelHumanROI)
     NPHuman <- as.matrix(rep("Human data"),length(rois))
     
-    data_Site <- data.frame(sid, t1ROI, meanSite[,j], sdSite[,j], NPHuman)
+    data_Site <- data.frame(sid_name, sid, t1ROI, meanSite[,j], sdSite[,j], NPHuman, szSample[,j])
     
     if (j==1){
       dataTmp = rbind(data.frame(), data_Site)
@@ -121,7 +127,7 @@ comparison_NISThuman_human <- function(sitesH){
       dataTmp <- dataSite2plot
     }
   }
-  colnames(dataSite2plot) <- c('Site', 't1ROI', 'Mean', 'Std', 'NPHuman')
+  colnames(dataSite2plot) <- c('Site_name', 'Site', 't1ROI', 'Mean', 'Std', 'NPHuman', 'szSample')
   returnHumanData <- list("dataLong_human" = dataSite2plot_long,
                           "data_human" = dataSite2plot)
   return(returnHumanData)
